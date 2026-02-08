@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artificial Goon Intelligence</title>
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <!-- Video background -->
+    <div class="video-backdrop" aria-hidden="true">
+      <video class="video-bg" autoplay muted loop playsinline>
+        <source src="assets/background.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+    <!-- Background glow -->
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <a href="/" class="logo" aria-label="Artificial Goon Intelligence">
+        <span class="logo-text">AGI</span>
+      </a>
+      <nav class="nav-pill">
+        <a href="#experiment">Experiment</a>
+        <a href="#features">Behavior</a>
+        <a href="#faqs">FAQs</a>
+        <button type="button" class="nav-pill-btn" id="open-leaderboard" aria-label="Open leaderboard">Leaderboard</button>
+      </nav>
+      <div class="header-icons">
+        <a href="https://x.com/i/communities/2020600502996586520/" target="_blank" rel="noopener" class="header-icon" aria-label="Twitter / X">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://github.com/joncinque" target="_blank" rel="noopener" class="header-icon" aria-label="GitHub">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+      </div>
+      <button type="button" class="btn btn-wallet" id="connect-wallet-btn">Connect wallet</button>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <h1 class="hero-title">
+        <span class="hero-title-inner">Artificial Goon Intelligence</span>
+      </h1>
+      <a href="gooning.html" target="_blank" rel="noopener" class="btn btn-launch">
+        Start Gooning
+        <span class="btn-launch-icon">
+          <img src="assets/sperm.png" alt="" width="28" height="28" class="btn-launch-img">
+        </span>
+      </a>
+    </main>
+
+    <!-- Section: The Experiment -->
+    <section class="block block--alt" id="experiment">
+      <div class="block-inner">
+        <h2 class="block-title">The Experiment</h2>
+        <p class="block-text">
+          Artificial Goon Intelligence is a behavioral art experiment. We observe how humans interact with a webpage: scrolling, clicking, moving the mouse, switching tabs, or doing nothing at all. No data leaves your device. No tracking, no profiles, no storage. Everything runs in your browser and disappears when you close the tab.
+        </p>
+        <p class="block-text">
+          The goal is to reflect back a simple question: <em>How do you behave when you think something is watching?</em> The meter you see is an illusion, a mirror of heuristics and randomness, not real measurement.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section: How People Behave Online -->
+    <section class="block" id="features">
+      <div class="block-inner">
+        <h2 class="block-title">How People Behave Online</h2>
+        <p class="block-text">
+          On any site, behavior leaves traces: scroll depth, click patterns, time on page, focus and blur. People scroll when they’re curious, click when they’re decisive, and go idle when they’re distracted or multitasking. Rapid, chaotic clicks often signal impatience or exploration; long pauses can mean reading, thinking, or the tab forgotten in the background.
+        </p>
+        <ul class="block-list">
+          <li><strong>Scroll</strong> seeking, scanning, or escaping.</li>
+          <li><strong>Clicks</strong> intention, habit, or noise.</li>
+          <li><strong>Mouse movement</strong> attention or restlessness.</li>
+          <li><strong>Tab focus / blur</strong> context switching, multitasking.</li>
+          <li><strong>Idle time</strong> absence of input; the system infers nothing, or everything.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section: Perception & Awareness -->
+    <section class="block block--alt" id="perception">
+      <div class="block-inner">
+        <h2 class="block-title">Perception &amp; Awareness</h2>
+        <p class="block-text">
+          The “Goon Awareness” meter does not measure you. It reacts to browser events with a mix of simple rules and randomness. Sometimes scroll increases the number; sometimes idle decreases it. Sometimes the logic is inverted or overridden by noise. About 30-40% of the changes are deliberately non-deterministic, because real behavior is messy, and so is the illusion.
+        </p>
+        <p class="block-text">
+          Rarely, a special state triggers: <em>You noticed too much.</em> The meter resets, freezes, then resumes from a low value. It’s a nod to the observer effect: the act of watching can change what is watched, or at least how it feels.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section: Social Proof -->
+    <section class="block" id="social-proof">
+      <div class="block-inner">
+        <h2 class="block-title">Social Proof &amp; Herd Behavior</h2>
+        <p class="block-text">
+          On the web, people look for signals from others: comments, likes, “X people viewing,” trending lists. That’s social proof: we infer value or safety from the crowd. In trading and memecoins, the same impulse drives FOMO and copycat behavior. This project doesn’t show real social proof; it’s a stage for asking how much of your own behavior is yours, and how much is reaction to the idea of being observed or to the idea of a crowd.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section: FAQs -->
+    <section class="block block--alt" id="faqs">
+      <div class="block-inner">
+        <h2 class="block-title">FAQs</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3 class="faq-q">Is anything I do actually tracked or stored?</h3>
+            <p class="faq-a">No. All logic runs in your browser. No analytics, no cookies, no fingerprinting, no server-side logging of your behavior.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">What does the percentage mean?</h3>
+            <p class="faq-a">It’s an art heuristic. It reacts to scroll, clicks, idle, and focus in a deliberately noisy way. It doesn’t represent a real metric.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Why “Goon” and “Artificial Goon Intelligence”?</h3>
+            <p class="faq-a">A playful take on AGI and internet culture. The “goon” here is the user as participant in a small behavioral theater, observed only by a script that forgets everything.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Can I use this for real research?</h3>
+            <p class="faq-a">As an art piece, it’s not designed for rigorous studies. The logic is non-deterministic and session-local. For real behavioral research, use proper tools and ethics.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Goon Consciousness Meter (art illusion, session-only) -->
+    <div id="goon-consciousness-meter" class="goon-meter" aria-live="polite">
+      <div class="goon-meter-label">GOON AWARENESS</div>
+      <div class="goon-meter-value" id="goon-meter-value">--%</div>
+      <div class="goon-meter-bar"><span class="goon-meter-fill" id="goon-meter-fill"></span></div>
+      <div class="goon-meter-status" id="goon-meter-status">Calibrating perception…</div>
+    </div>
+  </div>
+
+  <!-- Leaderboard modal -->
+  <div id="leaderboard-modal" class="leaderboard-modal hidden" aria-hidden="true">
+    <div class="leaderboard-backdrop" id="leaderboard-backdrop"></div>
+    <div class="leaderboard-box">
+      <div class="leaderboard-header">
+        <h2 class="leaderboard-title">Top Gooners</h2>
+        <button type="button" class="leaderboard-close" id="leaderboard-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Address</th>
+              <th>Pair</th>
+              <th>Timeframe</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="goon-consciousness.js"></script>
+  <script src="wallet.js"></script>
+  <script src="leaderboard.js"></script>
+</body>
+</html>

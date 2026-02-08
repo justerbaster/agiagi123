@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gooning — Chart Emulation</title>
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #0a0b0f;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ——— Select screen ——— */
+    #screen-select {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+      overflow: hidden;
+    }
+    #screen-select::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: url('assets/sperm.png') center / cover no-repeat;
+      filter: blur(12px);
+      opacity: 0.85;
+    }
+    #screen-select::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: rgba(10, 11, 15, 0.75);
+    }
+    #screen-select .select-title,
+    #screen-select .select-subtitle,
+    #screen-select .select-card {
+      position: relative;
+      z-index: 2;
+    }
+    #screen-select.hidden { display: none; }
+    .select-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+    .select-subtitle {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1.25rem;
+    }
+    .select-card {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(18, 18, 26, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    .select-section {
+      margin-bottom: 1.35rem;
+    }
+    .select-section:last-of-type { margin-bottom: 0; }
+    .select-section-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 0.6rem;
+    }
+    .select-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .select-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 1.1rem 0;
+    }
+    .pairs-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.45rem;
+    }
+    @media (max-width: 420px) {
+      .pairs-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .pair-btn {
+      display: block;
+      width: 100%;
+      padding: 0.55rem 0.4rem;
+      background: rgba(28, 28, 38, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      text-align: center;
+    }
+    .pair-btn:hover {
+      background: rgba(42, 42, 55, 0.95);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .pair-btn.selected {
+      background: rgba(100, 150, 255, 0.18);
+      border-color: rgba(100, 150, 255, 0.4);
+    }
+    .pair-btn small {
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 0.15rem;
+    }
+    .tf-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .option-btn {
+      padding: 0.4rem 0.75rem;
+      background: rgba(28, 28, 38, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.85);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .option-btn:hover {
+      background: rgba(42, 42, 55, 0.95);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .option-btn.selected {
+      background: rgba(100, 150, 255, 0.18);
+      border-color: rgba(100, 150, 255, 0.4);
+      color: #fff;
+    }
+    .behavior-row {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .behavior-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .behavior-group .select-section-title { margin-bottom: 0; }
+    .behavior-group .option-btn { padding: 0.45rem 1rem; }
+    .start-gooning-btn {
+      margin-top: 1.25rem;
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: linear-gradient(135deg, rgba(100, 150, 255, 0.4), rgba(80, 120, 200, 0.45));
+      border: 1px solid rgba(100, 150, 255, 0.45);
+      border-radius: 10px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .start-gooning-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .start-gooning-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ——— Chart screen ——— */
+    #screen-chart { min-height: 100vh; display: flex; flex-direction: column; }
+    #screen-chart.hidden { display: none; }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: rgba(12, 12, 18, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .chart-symbol { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.02em; }
+    .chart-price { font-weight: 600; font-size: 1rem; }
+    .chart-price.up { color: #22c55e; }
+    .chart-price.down { color: #ef4444; }
+    .chart-tabs {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .chart-tabs span {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+    }
+    .chart-tabs span.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .gooner-timer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 0.5rem 0.75rem;
+      background: rgba(100, 150, 255, 0.15);
+      border-radius: 8px;
+      border: 1px solid rgba(100, 150, 255, 0.25);
+    }
+    .gooner-timer-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    #chart-container {
+      width: 100%;
+      flex: 1;
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-footer {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      background: rgba(12, 12, 18, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .chart-footer-btn {
+      padding: 0.5rem 1.25rem;
+      background: rgba(40, 40, 55, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.9);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .chart-footer-btn:hover {
+      background: rgba(55, 55, 75, 0.95);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .chart-footer-btn--main {
+      background: rgba(100, 150, 255, 0.2);
+      border-color: rgba(100, 150, 255, 0.35);
+    }
+    .chart-footer-btn--main:hover {
+      background: rgba(100, 150, 255, 0.3);
+    }
+    .chart-footer-btn--done {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.4);
+    }
+    .chart-footer-btn--done:hover {
+      background: rgba(34, 197, 94, 0.3);
+    }
+
+    /* ——— Result screen ——— */
+    #screen-result {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: #0a0b0f;
+    }
+    #screen-result::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: url('assets/agi-splash.png') center / cover no-repeat;
+      pointer-events: none;
+    }
+    #screen-result.hidden { display: none; }
+    .result-card {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      width: 100%;
+      padding: 2rem;
+      background: rgba(18, 18, 26, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .result-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    .result-stats {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 1rem;
+    }
+    .result-grade {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: rgba(100, 150, 255, 0.95);
+      margin-bottom: 1.5rem;
+    }
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .result-btn {
+      display: block;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(40, 40, 55, 0.9);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .result-btn:hover {
+      background: rgba(55, 55, 75, 0.95);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .result-btn--twitter {
+      background: rgba(29, 155, 240, 0.25);
+      border-color: rgba(29, 155, 240, 0.5);
+    }
+    .result-btn--twitter:hover {
+      background: rgba(29, 155, 240, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <!-- Screen 1: Options -->
+  <div id="screen-select">
+    <div class="select-title">Emulate chart for your gooning</div>
+    <div class="select-subtitle">Choose chart → set behavior → start</div>
+    <div class="select-card">
+      <div class="select-section">
+        <div class="select-section-title">Chart: pair &amp; timeframe</div>
+        <div class="pairs-grid" id="pairs-grid"></div>
+        <div class="select-divider"></div>
+        <div class="tf-row" id="timeframe-options">
+          <button type="button" class="option-btn selected" data-tf="60">1m</button>
+          <button type="button" class="option-btn" data-tf="300">5m</button>
+          <button type="button" class="option-btn" data-tf="900">15m</button>
+          <button type="button" class="option-btn" data-tf="1800">30m</button>
+          <button type="button" class="option-btn" data-tf="3600">1h</button>
+          <button type="button" class="option-btn" data-tf="14400">4h</button>
+          <button type="button" class="option-btn" data-tf="86400">1D</button>
+          <button type="button" class="option-btn" data-tf="604800">1W</button>
+        </div>
+      </div>
+      <div class="select-divider"></div>
+      <div class="select-section">
+        <div class="select-section-title">Behavior: how price moves</div>
+        <div class="behavior-row">
+          <div class="behavior-group">
+            <span class="select-section-title">Volatility</span>
+            <div class="tf-row" id="volatility-options">
+              <button type="button" class="option-btn" data-vol="0.5">Low</button>
+              <button type="button" class="option-btn selected" data-vol="1">Medium</button>
+              <button type="button" class="option-btn" data-vol="1.8">High</button>
+            </div>
+          </div>
+          <div class="behavior-group">
+            <span class="select-section-title">Trend</span>
+            <div class="tf-row" id="trend-options">
+              <button type="button" class="option-btn selected" data-trend="0">Neutral</button>
+              <button type="button" class="option-btn" data-trend="1">Bullish</button>
+              <button type="button" class="option-btn" data-trend="-1">Bearish</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="start-gooning-btn" id="start-gooning-btn">Start gooning</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Chart + timer -->
+  <div id="screen-chart" class="hidden">
+    <div class="chart-header">
+      <div class="chart-symbol" id="chart-symbol">- / USD</div>
+      <div class="chart-tabs" id="chart-tabs">
+        <span data-tf="60">1m</span>
+        <span data-tf="300">5m</span>
+        <span data-tf="900">15m</span>
+        <span data-tf="1800">30m</span>
+        <span data-tf="3600">1h</span>
+        <span data-tf="14400">4h</span>
+        <span data-tf="86400">1D</span>
+        <span data-tf="604800">1W</span>
+      </div>
+      <div class="gooner-timer">
+        <span class="gooner-timer-label">AGI TIMER</span>
+        <span id="gooner-timer">—</span>
+      </div>
+      <div class="chart-price" id="chart-price">—</div>
+    </div>
+    <div id="chart-container"></div>
+    <div class="chart-footer">
+      <button type="button" class="chart-footer-btn chart-footer-btn--done" id="btn-im-done">I'm done</button>
+      <button type="button" class="chart-footer-btn" id="btn-back-menu">Back to menu</button>
+      <button type="button" class="chart-footer-btn chart-footer-btn--main" id="btn-main">To main</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Result + share -->
+  <div id="screen-result" class="hidden">
+    <div class="result-card">
+      <div class="result-title">You're done</div>
+      <div class="result-stats" id="result-stats">—</div>
+      <div class="result-grade" id="result-grade">—</div>
+      <div class="result-actions">
+        <a href="#" target="_blank" rel="noopener" class="result-btn result-btn--twitter" id="btn-share-twitter">Share on X (Twitter)</a>
+        <button type="button" class="result-btn" id="btn-result-main">To main</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var PAIRS = [
+        { id: 'BTCUSDT', label: 'BTC / USDT', base: 97000, vol: 0.002 },
+        { id: 'ETHUSDT', label: 'ETH / USDT', base: 3500, vol: 0.004 },
+        { id: 'BNBUSDT', label: 'BNB / USDT', base: 680, vol: 0.005 },
+        { id: 'SOLUSDT', label: 'SOL / USDT', base: 200, vol: 0.008 },
+        { id: 'XRPUSDT', label: 'XRP / USDT', base: 2.4, vol: 0.01 },
+        { id: 'DOGEUSDT', label: 'DOGE / USDT', base: 0.38, vol: 0.012 },
+        { id: 'ADAUSDT', label: 'ADA / USDT', base: 1.0, vol: 0.01 },
+        { id: 'AVAXUSDT', label: 'AVAX / USDT', base: 38, vol: 0.01 },
+        { id: 'DOTUSDT', label: 'DOT / USDT', base: 7.2, vol: 0.009 },
+        { id: 'LINKUSDT', label: 'LINK / USDT', base: 18, vol: 0.008 }
+      ];
+
+      var screenSelect = document.getElementById('screen-select');
+      var screenChart = document.getElementById('screen-chart');
+      var screenResult = document.getElementById('screen-result');
+      var resultStats = document.getElementById('result-stats');
+      var resultGrade = document.getElementById('result-grade');
+      var btnShareTwitter = document.getElementById('btn-share-twitter');
+      var pairsGrid = document.getElementById('pairs-grid');
+      var chartSymbol = document.getElementById('chart-symbol');
+      var chartPrice = document.getElementById('chart-price');
+      var goonerTimer = document.getElementById('gooner-timer');
+      var chartContainer = document.getElementById('chart-container');
+
+      var timerInterval = null;
+      var emulationInterval = null;
+      var chart = null;
+      var candleSeries = null;
+      var currentPair = null;
+      var currentPrice = 0;
+      var currentBar = null;
+      var lastSec = null;
+      var options = {
+        pair: null,
+        timeframe: 60,
+        volatility: 1,
+        trend: 0
+      };
+
+      var elapsedSec = 0;
+      var lastShareText = '';
+
+      var GRADE_PHRASES = [
+        'Diamond hands',
+        'Peak degen energy',
+        'Calm observer',
+        'Chart whisperer',
+        'Unshaken',
+        'Smooth brain certified',
+        'Ape tier',
+        'Touch grass recommended',
+        'Legendary patience',
+        'Unbothered'
+      ];
+
+      function formatTimer(sec) {
+        var m = Math.floor(sec / 60);
+        var s = sec % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function startGoonerTimer() {
+        elapsedSec = 0;
+        goonerTimer.textContent = '0:00';
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(function () {
+          elapsedSec++;
+          goonerTimer.textContent = formatTimer(elapsedSec);
+        }, 1000);
+      }
+
+      function formatTimePacific(ts, tickMarkType) {
+        var sec = typeof ts === 'number' ? ts : 0;
+        var d = new Date(sec * 1000);
+        var tz = 'America/Los_Angeles';
+        if (tickMarkType === 4) {
+          return d.toLocaleTimeString('en-US', { timeZone: tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        if (tickMarkType === 3) {
+          return d.toLocaleTimeString('en-US', { timeZone: tz, hour12: false, hour: '2-digit', minute: '2-digit' });
+        }
+        if (tickMarkType === 0) return d.toLocaleDateString('en-US', { timeZone: tz, year: 'numeric', month: 'short' }).slice(0, 8);
+        if (tickMarkType === 1) return d.toLocaleDateString('en-US', { timeZone: tz, month: 'short', day: 'numeric' }).slice(0, 8);
+        return d.toLocaleDateString('en-US', { timeZone: tz, month: 'short', day: 'numeric' }).slice(0, 8);
+      }
+
+      function ensureCandleBody(open, high, low, close, priceScale) {
+        var minRange = priceScale * 0.0003;
+        if (high <= low) {
+          high = close + minRange;
+          low = open - minRange;
+          if (low < 0) low = 0;
+        }
+        var range = high - low;
+        if (range < minRange) {
+          high = close + minRange / 2;
+          low = open - minRange / 2;
+          if (low < 0) { low = 0; high = minRange; }
+        }
+        return { open: open, high: high, low: low, close: close };
+      }
+
+      function roundCandle(c) {
+        var t = c.time;
+        return {
+          time: t,
+          open: Math.round(c.open * 100) / 100,
+          high: Math.round(c.high * 100) / 100,
+          low: Math.round(c.low * 100) / 100,
+          close: Math.round(c.close * 100) / 100
+        };
+      }
+
+      function generateInitialBars(pair, count, opts) {
+        var bars = [];
+        var interval = opts.timeframe;
+        var now = Math.floor(Date.now() / 1000);
+        var t0 = Math.floor(now / interval) * interval - count * interval;
+        var p = pair.base;
+        var volMult = opts.volatility || 1;
+        var trendDrift = opts.trend === 1 ? 0.00015 : opts.trend === -1 ? -0.00015 : 0;
+        for (var i = 0; i < count; i++) {
+          var o = p;
+          var change = (Math.random() - 0.5) * 2 * pair.vol * p * volMult + p * trendDrift;
+          p = Math.max(p * 0.98, Math.min(p * 1.02, p + change));
+          var h = Math.max(o, p) * (1 + Math.random() * 0.003);
+          var l = Math.min(o, p) * (1 - Math.random() * 0.003);
+          if (h <= l) { h = Math.max(o, p) * 1.001; l = Math.min(o, p) * 0.999; }
+          var c = ensureCandleBody(o, h, l, p, p);
+          bars.push(roundCandle({
+            time: t0 + i * interval,
+            open: c.open,
+            high: c.high,
+            low: c.low,
+            close: c.close
+          }));
+        }
+        return bars;
+      }
+
+      function tickEmulation() {
+        if (!currentPair || !candleSeries) return;
+        var interval = options.timeframe;
+        var now = Math.floor(Date.now() / 1000);
+        var barTime = Math.floor(now / interval) * interval;
+        var vol = currentPair.vol * currentPair.base * (options.volatility || 1);
+        var trendDrift = options.trend === 1 ? 0.00008 : options.trend === -1 ? -0.00008 : 0;
+        var change = (Math.random() - 0.5) * 2 * vol * 0.5 + currentPrice * trendDrift;
+        currentPrice = Math.max(currentPrice * 0.998, Math.min(currentPrice * 1.002, currentPrice + change));
+        if (lastSec !== barTime) {
+          if (currentBar) {
+            var prev = ensureCandleBody(currentBar.open, currentBar.high, currentBar.low, currentBar.close, currentPrice);
+            candleSeries.update(roundCandle({ time: lastSec, open: prev.open, high: prev.high, low: prev.low, close: prev.close }));
+          }
+          currentBar = {
+            open: currentPrice,
+            high: currentPrice,
+            low: currentPrice,
+            close: currentPrice
+          };
+          lastSec = barTime;
+        } else {
+          currentBar.high = Math.max(currentBar.high, currentPrice);
+          currentBar.low = Math.min(currentBar.low, currentPrice);
+          currentBar.close = currentPrice;
+        }
+        var cur = ensureCandleBody(currentBar.open, currentBar.high, currentBar.low, currentBar.close, currentPrice);
+        candleSeries.update(roundCandle({ time: barTime, open: cur.open, high: cur.high, low: cur.low, close: cur.close }));
+        chartPrice.textContent = '$' + currentPrice.toFixed(currentPair.base >= 1 ? 2 : 4);
+        chartPrice.classList.toggle('up', currentBar.close >= currentBar.open);
+        chartPrice.classList.toggle('down', currentBar.close < currentBar.open);
+      }
+
+      function initChart(pair, opts) {
+        currentPair = pair;
+        options.pair = pair;
+        options.timeframe = opts.timeframe;
+        options.volatility = opts.volatility;
+        options.trend = opts.trend;
+        currentPrice = pair.base;
+        lastSec = null;
+        currentBar = null;
+        chartContainer.innerHTML = '';
+        chart = LightweightCharts.createChart(chartContainer, {
+          layout: {
+            background: { type: 'solid', color: '#0a0b0f' },
+            textColor: 'rgba(255, 255, 255, 0.7)'
+          },
+          grid: {
+            vertLines: { color: 'rgba(255, 255, 255, 0.06)' },
+            horzLines: { color: 'rgba(255, 255, 255, 0.06)' }
+          },
+          crosshair: { mode: 1 },
+          rightPriceScale: {
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            scaleMargins: { top: 0.1, bottom: 0.15 }
+          },
+          timeScale: {
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            timeVisible: true,
+            secondsVisible: false,
+            tickMarkFormatter: function (time, tickMarkType) {
+              return formatTimePacific(time, tickMarkType);
+            }
+          },
+          autoSize: true
+        });
+        candleSeries = chart.addCandlestickSeries({
+          upColor: '#22c55e',
+          downColor: '#ef4444',
+          borderUpColor: '#22c55e',
+          borderDownColor: '#ef4444'
+        });
+        var barCounts = { 60: 120, 300: 60, 900: 48, 1800: 48, 3600: 48, 14400: 24, 86400: 14, 604800: 8 };
+        var barCount = barCounts[opts.timeframe] || 60;
+        var bars = generateInitialBars(pair, barCount, opts);
+        candleSeries.setData(bars);
+        var last = bars[bars.length - 1];
+        lastSec = last.time;
+        currentBar = { open: last.open, high: last.high, low: last.low, close: last.close };
+        currentPrice = last.close;
+        chartPrice.textContent = '$' + currentPrice.toFixed(pair.base >= 1 ? 2 : 4);
+        chartPrice.classList.add(last.close >= last.open ? 'up' : 'down');
+        chart.timeScale().fitContent();
+        var tfLabels = chartHeader.querySelectorAll('#chart-tabs span');
+        tfLabels.forEach(function (el) {
+          el.classList.toggle('active', parseInt(el.dataset.tf, 10) === opts.timeframe);
+        });
+      }
+
+      function startGooning() {
+        if (!options.pair) return;
+        screenSelect.classList.add('hidden');
+        screenChart.classList.remove('hidden');
+        chartSymbol.textContent = options.pair.label.replace(' ', ' / ');
+        initChart(options.pair, {
+          timeframe: options.timeframe,
+          volatility: options.volatility,
+          trend: options.trend
+        });
+        startGoonerTimer();
+        if (emulationInterval) clearInterval(emulationInterval);
+        emulationInterval = setInterval(tickEmulation, options.timeframe === 1 ? 1000 : 1000);
+      }
+
+      var chartHeader = document.querySelector('.chart-header');
+      document.getElementById('start-gooning-btn').addEventListener('click', startGooning);
+
+      function showResult() {
+        if (timerInterval) clearInterval(timerInterval);
+        if (emulationInterval) clearInterval(emulationInterval);
+        timerInterval = null;
+        emulationInterval = null;
+        var duration = formatTimer(elapsedSec);
+        var pairLabel = currentPair ? currentPair.label.replace(' / ', '/') : '—';
+        var volLabel = options.volatility <= 0.6 ? 'Low' : options.volatility >= 1.5 ? 'High' : 'Medium';
+        var trendLabel = options.trend === 1 ? 'Bullish' : options.trend === -1 ? 'Bearish' : 'Neutral';
+        var grade = GRADE_PHRASES[Math.floor(Math.random() * GRADE_PHRASES.length)];
+        var statsLine = 'Duration: ' + duration + ' • ' + pairLabel + ' • ' + volLabel + ' volatility • ' + trendLabel;
+        resultStats.textContent = statsLine;
+        resultGrade.textContent = 'Grade: ' + grade;
+        lastShareText = 'I just finished gooning for ' + duration + ' on ' + pairLabel + '.\n' + volLabel + ' volatility, ' + trendLabel + '.\nGrade: ' + grade + '.\n\n#AGI #ArtificialGoonIntelligence';
+        btnShareTwitter.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(lastShareText);
+        screenChart.classList.add('hidden');
+        screenResult.classList.remove('hidden');
+      }
+
+      document.getElementById('btn-im-done').addEventListener('click', showResult);
+
+      document.getElementById('btn-back-menu').addEventListener('click', function () {
+        if (timerInterval) clearInterval(timerInterval);
+        if (emulationInterval) clearInterval(emulationInterval);
+        timerInterval = null;
+        emulationInterval = null;
+        screenChart.classList.add('hidden');
+        screenSelect.classList.remove('hidden');
+      });
+
+      document.getElementById('btn-main').addEventListener('click', function () {
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('btn-share-twitter').addEventListener('click', function (e) {
+        e.preventDefault();
+        window.open(btnShareTwitter.href, 'twitter-share', 'width=550,height=420');
+      });
+
+      document.getElementById('btn-result-main').addEventListener('click', function () {
+        screenResult.classList.add('hidden');
+        window.location.href = 'index.html';
+      });
+
+      document.querySelectorAll('#timeframe-options .option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('#timeframe-options .option-btn').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          options.timeframe = parseInt(btn.dataset.tf, 10);
+        });
+      });
+      document.querySelectorAll('#volatility-options .option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('#volatility-options .option-btn').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          options.volatility = parseFloat(btn.dataset.vol, 10);
+        });
+      });
+      document.querySelectorAll('#trend-options .option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('#trend-options .option-btn').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          options.trend = parseInt(btn.dataset.trend, 10);
+        });
+      });
+
+      PAIRS.forEach(function (p, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pair-btn';
+        btn.dataset.pairId = p.id;
+        btn.textContent = p.label.replace(' / USDT', '');
+        var small = document.createElement('small');
+        small.textContent = '~$' + (p.base >= 1 ? p.base.toFixed(0) : p.base.toFixed(2));
+        btn.appendChild(small);
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.pairs-grid .pair-btn').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          options.pair = p;
+        });
+        if (idx === 0) {
+          btn.classList.add('selected');
+          options.pair = p;
+        }
+        pairsGrid.appendChild(btn);
+      });
+    })();
+  </script>
+</body>
+</html>
