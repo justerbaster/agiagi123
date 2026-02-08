@@ -1,0 +1,14 @@
+{
+  "name": "agi",
+  "version": "1.0.0",
+  "description": "Artificial Goon Intelligence",
+  "scripts": {
+    "start": "serve . -l ${PORT:-3000}"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
